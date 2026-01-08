@@ -1,14 +1,22 @@
+import React from "react";
+import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
+import { Container, Row, Col } from "react-bootstrap";
 
-function Layout({ children }) {
+function Layout() {
   return (
-    <div style={{ display: "flex" }}>
-      <Sidebar />
-      <div style={{ padding: "30px", background: "#f5f6fa", flex: 1, minHeight: "100vh" }}>
-        {children}
-      </div>
-    </div>
+    <Container fluid>
+      <Row>
+        <Col md={2} className="bg-light min-vh-100">
+          <Sidebar />
+        </Col>
+        <Col md={10}>
+          <Outlet />
+        </Col>
+      </Row>
+    </Container>
   );
 }
 
 export default Layout;
+
