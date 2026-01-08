@@ -1,53 +1,68 @@
-import Layout from "../components/Layout";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { Container, Card, Row, Col } from "react-bootstrap";
 
-function Dashboard({ companies }) {
-  const total = companies.length;
-  const applied = companies.filter(c => c.status === "Applied").length;
-  const interview = companies.filter(c => c.status === "Interview").length;
-  const selected = companies.filter(c => c.status === "Selected").length;
+const API = "https://placement-tracker-api.onrender.com";
+
+function Dashboard() {
+  const [companies, setCompanies] = useState([]);
+
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        const res = await axios.get(`${API}/companies`);
+
+        if (Array.isArray(res.data)) {
+          setCompanies(res.data);
+        } else {
+          setCompanies([]);
+        }
+      } catch (err) {
+        console.error("Dashboard fetch error:", err);
+        setCompanies([]);
+      }
+    };
+
+    fetchCompanies();
+  }, []);
+
+  const applied = companies.filter((c) => c.status === "Applied").length;
+  const interview = companies.filter((c) => c.status === "Interview").length;
+  const offer = companies.filter((c) => c.status === "Offer").length;
 
   return (
-    <Layout>
-      {/* Hero */}
-      <div
-        style={{
-          background: "linear-gradient(135deg, #6366f1, #3b82f6)",
-          color: "white",
-          padding: "30px",
-          borderRadius: "16px",
-          marginBottom: "30px"
-        }}
-      >
-        <h1>Placement Tracker</h1>
-        <p>Track your applications in one place</p>
-      </div>
+    <Container className="mt-4">
+      <h2 className="mb-4">Dashboard</h2>
 
-      {/* Stats */}
-      <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
-        <Stat title="Total Applications" value={total} icon="📄" />
-        <Stat title="Applied" value={applied} icon="📝" />
-        <Stat title="Interviews" value={interview} icon="🎤" />
-        <Stat title="Selected" value={selected} icon="🎉" />
-      </div>
-    </Layout>
-  );
-}
+      <Row>
+        <Col md={4}>
+          <Card className="mb-3">
+            <Card.Body>
+              <Card.Title>Applied</Card.Title>
+              <h3>{applied}</h3>
+            </Card.Body>
+          </Card>
+        </Col>
 
-function Stat({ title, value, icon }) {
-  return (
-    <div
-      style={{
-        background: "white",
-        padding: "20px",
-        borderRadius: "14px",
-        minWidth: "200px",
-        boxShadow: "0 10px 20px rgba(0,0,0,0.08)"
-      }}
-    >
-      <div style={{ fontSize: "26px" }}>{icon}</div>
-      <h2>{value}</h2>
-      <p style={{ color: "#6b7280" }}>{title}</p>
-    </div>
+        <Col md={4}>
+          <Card className="mb-3">
+            <Card.Body>
+              <Card.Title>Interviews</Card.Title>
+              <h3>{interview}</h3>
+            </Card.Body>
+          </Card>
+        </Col>
+
+        <Col md={4}>
+          <Card className="mb-3">
+            <Card.Body>
+              <Card.Title>Offers</Card.Title>
+              <h3>{offer}</h3>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+    </Container>
   );
 }
 
