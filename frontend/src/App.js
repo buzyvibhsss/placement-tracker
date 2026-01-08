@@ -11,7 +11,7 @@ function App() {
 
   const fetchCompanies = () => {
     axios
-      .get("http://localhost:5000/companies")
+      .get("https:////placement-tracker-api.onrender.com")
       .then(res => setCompanies(res.data))
       .catch(err => console.log(err));
   };
