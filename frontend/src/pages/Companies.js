@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Container, Button, Table, Form } from "react-bootstrap";
 
-const API = process.env.REACT_APP_API_URL;
+
+const API = "https://placement-tracker-api.onrender.com";
 
 function Companies() {
   const [companies, setCompanies] = useState([]);
@@ -15,26 +16,50 @@ function Companies() {
     status: "Applied",
   });
 
+  // Fetch companies
   const fetchCompanies = async () => {
-    const res = await axios.get(`${API}/companies`);
-    setCompanies(res.data);
+    try {
+      const res = await axios.get(`${API}/companies`);
+      setCompanies(res.data);
+    } catch (err) {
+      console.error("Fetch error:", err);
+    }
   };
 
   useEffect(() => {
     fetchCompanies();
   }, []);
 
+  // Add company
   const addCompany = async (e) => {
     e.preventDefault();
-    await axios.post(`${API}/companies`, form);
-    setForm({ name: "", role: "", status: "Applied" });
-    setShowForm(false);
-    fetchCompanies();
+    try {
+      await axios.post(
+        `${API}/companies`,
+        form,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      setForm({ name: "", role: "", status: "Applied" });
+      setShowForm(false);
+      fetchCompanies();
+    } catch (err) {
+      console.error("Add error:", err);
+      alert("Failed to add company");
+    }
   };
 
+  // Delete company
   const deleteCompany = async (id) => {
-    await axios.delete(`${API}/companies/${id}`);
-    fetchCompanies();
+    try {
+      await axios.delete(`${API}/companies/${id}`);
+      fetchCompanies();
+    } catch (err) {
+      console.error("Delete error:", err);
+    }
   };
 
   const filteredCompanies =
@@ -128,4 +153,3 @@ function Companies() {
 }
 
 export default Companies;
-
