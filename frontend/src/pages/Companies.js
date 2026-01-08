@@ -1,196 +1,131 @@
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import Layout from "../components/Layout";
+import { Container, Button, Table, Form } from "react-bootstrap";
 
-function Companies({ companies, fetchCompanies }) {
+const API = process.env.REACT_APP_API_URL;
+
+function Companies() {
+  const [companies, setCompanies] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [filter, setFilter] = useState("All");
 
   const [form, setForm] = useState({
     name: "",
     role: "",
-    status: "Applied"
+    status: "Applied",
   });
 
-  const [filter, setFilter] = useState("All");
-
-  // ADD COMPANY
-  const addCompany = async () => {
-    if (!form.name || !form.role) {
-      alert("Please fill all fields");
-      return;
-    }
-
-    try {
-      await axios.post("https://placement-tracker-api.onrender.com", form);
-      fetchCompanies();
-      setForm({ name: "", role: "", status: "Applied" });
-      setShowForm(false); // close form after add
-    } catch (err) {
-      console.log("Add error:", err);
-      alert("Failed to add company");
-    }
+  const fetchCompanies = async () => {
+    const res = await axios.get(`${API}/companies`);
+    setCompanies(res.data);
   };
-S
-  // DELETE COMPANY
-  const deleteCompany = async (id) => {
-    const ok = window.confirm("Delete this company?");
-    if (!ok) return;
 
-    try {
-      await axios.delete(`http://localhost:5000/companies/${id}`);
-      fetchCompanies();
-    } catch (err) {
-      console.log("Delete error:", err);
-      alert("Failed to delete company");
-    }
+  useEffect(() => {
+    fetchCompanies();
+  }, []);
+
+  const addCompany = async (e) => {
+    e.preventDefault();
+    await axios.post(`${API}/companies`, form);
+    setForm({ name: "", role: "", status: "Applied" });
+    setShowForm(false);
+    fetchCompanies();
+  };
+
+  const deleteCompany = async (id) => {
+    await axios.delete(`${API}/companies/${id}`);
+    fetchCompanies();
   };
 
   const filteredCompanies =
     filter === "All"
       ? companies
-      : companies.filter(c => c.status === filter);
+      : companies.filter((c) => c.status === filter);
 
   return (
-    <Layout>
-      {/* HEADER */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "20px"
-        }}
-      >
-        <h1>Companies</h1>
+    <Container className="mt-4">
+      <h2 className="mb-3">Companies</h2>
 
-        <button
-          className="btn btn-primary"
-          onClick={() => setShowForm(!showForm)}
-        >
-          {showForm ? "Close" : "+ Add Company"}
-        </button>
-      </div>
+      <Button onClick={() => setShowForm(!showForm)} className="mb-3">
+        {showForm ? "Close Form" : "Add Company"}
+      </Button>
 
-      {/* ADD COMPANY FORM (CONDITIONAL) */}
       {showForm && (
-        <div
-          style={{
-            background: "white",
-            padding: "20px",
-            borderRadius: "12px",
-            marginBottom: "30px",
-            maxWidth: "500px",
-            boxShadow: "0 10px 20px rgba(0,0,0,0.08)"
-          }}
-        >
-          <h4>Add Company</h4>
-
-          <input
-            className="form-control mb-2"
+        <Form onSubmit={addCompany} className="mb-4">
+          <Form.Control
+            className="mb-2"
             placeholder="Company Name"
             value={form.name}
-            onChange={(e) =>
-              setForm({ ...form, name: e.target.value })
-            }
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            required
           />
-
-          <input
-            className="form-control mb-2"
+          <Form.Control
+            className="mb-2"
             placeholder="Role"
             value={form.role}
-            onChange={(e) =>
-              setForm({ ...form, role: e.target.value })
-            }
+            onChange={(e) => setForm({ ...form, role: e.target.value })}
+            required
           />
-
-          <select
-            className="form-select mb-3"
+          <Form.Select
+            className="mb-2"
             value={form.status}
-            onChange={(e) =>
-              setForm({ ...form, status: e.target.value })
-            }
+            onChange={(e) => setForm({ ...form, status: e.target.value })}
           >
             <option>Applied</option>
+            <option>OA</option>
             <option>Interview</option>
-            <option>Selected</option>
             <option>Rejected</option>
-          </select>
+            <option>Offer</option>
+          </Form.Select>
 
-          <div style={{ display: "flex", gap: "10px" }}>
-            <button className="btn btn-success" onClick={addCompany}>
-              Save
-            </button>
-            <button
-              className="btn btn-secondary"
-              onClick={() => setShowForm(false)}
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
+          <Button type="submit">Save</Button>
+        </Form>
       )}
 
-      {/* FILTER */}
-      <select
-        className="form-select mb-4"
-        style={{ maxWidth: "220px" }}
+      <Form.Select
+        className="mb-3"
         value={filter}
         onChange={(e) => setFilter(e.target.value)}
       >
         <option>All</option>
         <option>Applied</option>
+        <option>OA</option>
         <option>Interview</option>
-        <option>Selected</option>
         <option>Rejected</option>
-      </select>
+        <option>Offer</option>
+      </Form.Select>
 
-      {/* COMPANY LIST */}
-      <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
-        {filteredCompanies.map(c => (
-          <div
-            key={c.id}
-            style={{
-              background: "white",
-              padding: "20px",
-              borderRadius: "14px",
-              width: "260px",
-              boxShadow: "0 10px 20px rgba(0,0,0,0.08)"
-            }}
-          >
-            <h4>{c.name}</h4>
-            <p>{c.role}</p>
-
-            <span
-              style={{
-                display: "inline-block",
-                marginBottom: "10px",
-                padding: "5px 10px",
-                borderRadius: "8px",
-                fontSize: "12px",
-                background:
-                  c.status === "Applied"
-                    ? "#e5e7eb"
-                    : c.status === "Interview"
-                    ? "#fde68a"
-                    : c.status === "Selected"
-                    ? "#bbf7d0"
-                    : "#fecaca"
-              }}
-            >
-              {c.status}
-            </span>
-
-            <button
-              className="btn btn-danger btn-sm mt-2"
-              onClick={() => deleteCompany(c.id)}
-            >
-              Delete
-            </button>
-          </div>
-        ))}
-      </div>
-    </Layout>
+      <Table bordered hover>
+        <thead>
+          <tr>
+            <th>Company</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredCompanies.map((c) => (
+            <tr key={c.id}>
+              <td>{c.name}</td>
+              <td>{c.role}</td>
+              <td>{c.status}</td>
+              <td>
+                <Button
+                  variant="danger"
+                  size="sm"
+                  onClick={() => deleteCompany(c.id)}
+                >
+                  Delete
+                </Button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+    </Container>
   );
 }
 
 export default Companies;
+
