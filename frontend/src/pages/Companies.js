@@ -3,7 +3,7 @@ import axios from "axios";
 import { Container, Button, Table, Form } from "react-bootstrap";
 
 
-const API = "https://placement-tracker-api.onrender.com";
+const API = "http://localhost:5000";
 
 function Companies() {
   const [companies, setCompanies] = useState([]);

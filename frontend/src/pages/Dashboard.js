@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Container, Card, Row, Col } from "react-bootstrap";
 
-const API = "https://placement-tracker-api.onrender.com";
+const API = "http://localhost:5000";
 
 function Dashboard() {
   const [companies, setCompanies] = useState([]); // ALWAYS array
@@ -70,6 +70,18 @@ function Dashboard() {
           </Card>
         </Col>
       </Row>
+
+      {/* About Project Card */}
+      <Card>
+        <Card.Body>
+          <h5>About this project</h5>
+          <p style={{ color: "#6b7280", marginBottom: 0 }}>
+            A full-stack placement tracking web application that helps students
+            manage job applications, track application statuses, and visualize
+            placement progress through an interactive dashboard and analytics.
+          </p>
+        </Card.Body>
+      </Card>
     </Container>
   );
 }

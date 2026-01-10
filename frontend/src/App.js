@@ -1,46 +1,20 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useEffect, useState } from "react";
-import axios from "axios";
+import Layout from "./components/Layout";
 
 import Dashboard from "./pages/Dashboard";
 import Companies from "./pages/Companies";
 import Analytics from "./pages/Analytics";
 
 function App() {
-  const [companies, setCompanies] = useState([]);
-
-  const fetchCompanies = () => {
-    axios
-      .get("https:////placement-tracker-api.onrender.com")
-      .then(res => setCompanies(res.data))
-      .catch(err => console.log(err));
-  };
-
-  useEffect(() => {
-    fetchCompanies();
-  }, []);
-
   return (
     <BrowserRouter>
-      <Routes>
-        <Route
-          path="/"
-          element={<Dashboard companies={companies} />}
-        />
-        <Route
-          path="/companies"
-          element={
-            <Companies
-              companies={companies}
-              fetchCompanies={fetchCompanies}
-            />
-          }
-        />
-        <Route
-          path="/analytics"
-          element={<Analytics companies={companies} />}
-        />
-      </Routes>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/companies" element={<Companies />} />
+          <Route path="/analytics" element={<Analytics />} />
+        </Routes>
+      </Layout>
     </BrowserRouter>
   );
 }

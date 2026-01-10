@@ -1,5 +1,7 @@
-import Layout from "../components/Layout";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import { Pie, Bar } from "react-chartjs-2";
+
 import {
   Chart as ChartJS,
   ArcElement,
@@ -19,62 +21,67 @@ ChartJS.register(
   BarElement
 );
 
-function Analytics({ companies }) {
+const API = "http://localhost:5000";
+
+function Analytics() {
+  const [companies, setCompanies] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get(`${API}/companies`)
+      .then(res => setCompanies(Array.isArray(res.data) ? res.data : []))
+      .catch(err => console.log(err));
+  }, []);
+
   const statusCount = {
     Applied: 0,
+    OA: 0,
     Interview: 0,
-    Selected: 0,
+    Offer: 0,
     Rejected: 0
   };
 
   companies.forEach(c => {
-    statusCount[c.status]++;
+    if (statusCount[c.status] !== undefined) {
+      statusCount[c.status]++;
+    }
   });
 
   const pieData = {
-    labels: ["Applied", "Interview", "Selected", "Rejected"],
+    labels: Object.keys(statusCount),
     datasets: [
       {
-        data: [
-          statusCount.Applied,
-          statusCount.Interview,
-          statusCount.Selected,
-          statusCount.Rejected
-        ],
-        backgroundColor: ["#93c5fd", "#fde68a", "#86efac", "#fca5a5"]
+        data: Object.values(statusCount),
+        backgroundColor: [
+          "#93c5fd",
+          "#fde68a",
+          "#a7f3d0",
+          "#86efac",
+          "#fca5a5"
+        ]
       }
     ]
   };
 
   const barData = {
-    labels: ["Applied", "Interview", "Selected", "Rejected"],
+    labels: Object.keys(statusCount),
     datasets: [
       {
         label: "Applications",
-        data: [
-          statusCount.Applied,
-          statusCount.Interview,
-          statusCount.Selected,
-          statusCount.Rejected
-        ],
+        data: Object.values(statusCount),
         backgroundColor: "#6366f1"
       }
     ]
   };
 
   return (
-    <Layout>
-      {/* Header */}
-      <div style={{ marginBottom: "20px" }}>
-        <h1>Analytics</h1>
-        <p style={{ color: "#6b7280" }}>
-          Visual overview of your placement progress
-        </p>
-      </div>
+    <div>
+      <h1>Analytics</h1>
+      <p style={{ color: "#6b7280", marginBottom: "20px" }}>
+        Visual overview of your placement progress
+      </p>
 
-      {/* Charts */}
       <div style={{ display: "flex", gap: "30px", flexWrap: "wrap" }}>
-        {/* Pie Chart */}
         <div
           style={{
             background: "white",
@@ -84,11 +91,10 @@ function Analytics({ companies }) {
             boxShadow: "0 10px 20px rgba(0,0,0,0.08)"
           }}
         >
-          <h5 style={{ marginBottom: "15px" }}>Status Distribution</h5>
+          <h5>Status Distribution</h5>
           <Pie data={pieData} />
         </div>
 
-        {/* Bar Chart */}
         <div
           style={{
             background: "white",
@@ -98,11 +104,11 @@ function Analytics({ companies }) {
             boxShadow: "0 10px 20px rgba(0,0,0,0.08)"
           }}
         >
-          <h5 style={{ marginBottom: "15px" }}>Applications Count</h5>
+          <h5>Applications Count</h5>
           <Bar data={barData} />
         </div>
       </div>
-    </Layout>
+    </div>
   );
 }
 

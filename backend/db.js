@@ -1,40 +1,19 @@
-/*const mysql = require("mysql2");
+const mysql = require("mysql2");
 
 const db = mysql.createConnection({
-  host: "127.0.0.1",        
-  user: "root",            
-  password: "Database123",  
-  database: "placement_tracker"
+  host: "127.0.0.1",
+  user: "root",
+  password: "Database123",
+  database: "placement_tracker",
+  port: 3306
 });
 
 db.connect((err) => {
   if (err) {
     console.log("DB connection failed:", err);
   } else {
-    console.log("MySQL connected");
+    console.log("MySQL connected (local)");
   }
 });
 
 module.exports = db;
-*/
-
-const mysql = require("mysql2");
-
-const db = mysql.createConnection({
-  host: process.env.MYSQLHOST,
-  user: process.env.MYSQLUSER,
-  password: process.env.MYSQLPASSWORD,
-  database: process.env.MYSQLDATABASE,
-  port: process.env.MYSQLPORT
-});
-
-db.connect(err => {
-  if (err) {
-    console.log("DB connection failed:", err);
-  } else {
-    console.log("MySQL connected");
-  }
-});
-
-module.exports = db;
-
